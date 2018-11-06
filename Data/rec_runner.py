@@ -1,13 +1,15 @@
 import pandas as pd
 import numpy as np
 from scipy import sparse
-from matrix_factorization_soln import MatrixFactorizationRec
-
+from matrix_factorization_soln import MF_LFM
+np.set_printoptions(threshold='nan')
 
 def get_ratings_data(fname):
     ratings_contents = pd.read_csv(fname)
     highest_user_id = ratings_contents.user.max()
+    # print(highest_user_id)
     highest_movie_id = ratings_contents.movie.max()
+    # print(highest_movie_id)
     ratings_as_mat = sparse.lil_matrix((highest_user_id, highest_movie_id))
     for _, row in ratings_contents.iterrows():
         # subtract 1 from id's due to match 0 indexing
@@ -50,7 +52,9 @@ if __name__ == "__main__":
     sample_sub_fname = "../data/sample_submission.csv"
     ratings_data_fname = "../data/training_ratings_for_kaggle_comp.csv"
     ratings_data_contents, ratings_mat = get_ratings_data(ratings_data_fname)
-    my_mf_rec_engine = MatrixFactorizationRec()
-    my_mf_rec_engine.fit(ratings_mat)
+    # print(ratings_data_contents)
+    # print(ratings_mat)
+    my_mf_rec_engine = MF_LFM()
+    my_mf_rec_engine.learningLFM(ratings_mat, 8, 2, 0.005, 0.01, 0.001)
     predictions_mat = my_mf_rec_engine.pred_all_users()
     create_submission(predictions_mat, "test_submission.csv", sample_sub_fname)

@@ -6,49 +6,55 @@ from numpy import matrix
 from numpy.random import rand
 
 
-class MatrixFactorizationRec(object):
+class MF_LFM(object):
+    # rating_mat is input
+    # features is hidden vector
+    # alpha stands for learning rate
+    # lamb stands for regularition parameter
+    # criterion is judge factor
 
-    def __init__(self, n_features=8, learn_rate=0.005,
-                 regularization_param=0.02, optimizer_pct_improvement_criterion=2):
-        self.n_features = n_features
-        self.learn_rate = learn_rate
-        self.regularization_param = regularization_param
-        self.optimizer_pct_improvement_criterion = optimizer_pct_improvement_criterion
-
-    def fit(self, ratings_mat):
+    def learningLFM(self, ratings_mat, features, learn_loops, alpha, lamb, criterion):
         self.ratings_mat = ratings_mat
-        self.average_rating = ratings_mat.mean()
         self.n_users = ratings_mat.shape[0]
         self.n_items = ratings_mat.shape[1]
-        self.n_rated = ratings_mat.nonzero()[0].size
-        self.user_mat = matrix(
-            rand(self.n_users*self.n_features).reshape([self.n_users, self.n_features]))
-        self.movie_mat = matrix(
-            rand(self.n_items*self.n_features).reshape([self.n_features, self.n_items]))
-        optimizer_iteration_count = 0
-        sse_accum = 0
-        print("Optimizaiton Statistics")
-        print("Iterations | Mean Squared Error  |  Percent Improvement")
-        while ((optimizer_iteration_count < 2) or (pct_improvement > self.optimizer_pct_improvement_criterion)):
-            old_sse = sse_accum
-            sse_accum = 0
-            for i in range(self.n_users):
-                for j in range(self.n_items):
-                    if self.ratings_mat[i, j] > 0:
-                        error = self.ratings_mat[i, j] - np.dot(self.user_mat[i, :], self.movie_mat[:, j])
-                        sse_accum += error**2
-                        for k in range(self.n_features):
-                            self.user_mat[i, k] = self.user_mat[i, k] + self.learn_rate * \
-                                (2 * error * self.movie_mat[k, j] - self.regularization_param * self.user_mat[i, k])
-                            self.movie_mat[k, j] = self.movie_mat[k, j] + self.learn_rate * \
-                                (2 * error * self.user_mat[
-                                 i, k] - self.regularization_param * self.movie_mat[k, j])
-            pct_improvement = 100 * (old_sse - sse_accum) / old_sse
-            print("%d \t\t %f \t\t %f" % (
-                optimizer_iteration_count, sse_accum / self.n_rated, pct_improvement))
-            old_sse = sse_accum
-            optimizer_iteration_count += 1
-        print("Fitting of latent feature matrices completed")
+        self.n_have_rated = ratings_mat.nonzero()[0].size
+        self.user_mat = matrix(rand(self.n_users, features))
+        self.movie_mat = matrix(rand(features, self.n_items))
+        iteration_fix_count = 0
+        curren_error = 100
+        for step in xrange(0, 5000,1):
+            previous_error = curren_error
+            curren_error = 0
+            for user_index in range(self.n_users):
+                for movie_index in range(self.n_items):
+                    error = self.ratings_mat[user_index, movie_index]
+                    if self.ratings_mat[user_index, movie_index] > 0:
+                        row = self.user_mat[user_index, :]
+                        column = self.movie_mat[:, movie_index]
+                        error -= np.dot(row, column)
+                        curren_error += pow(error, 2)
+                        for features_index in range(features):
+                            user_value = self.user_mat[user_index, features_index]
+                            movie_value = self.movie_mat[features_index, movie_index]
+
+                            delta_user = alpha * (error * movie_value - lamb * user_value)
+                            self.user_mat[user_index, features_index] += delta_user
+
+                            delta_movie = alpha * (error * user_value - lamb * movie_value)
+                            self.movie_mat[features_index, movie_index] += delta_movie
+            percentage = float(previous_error - curren_error) / previous_error
+            print("Learning LFM Process")
+            print("Loops | MSE  | Improved percentage")
+            print("%d\t%f\t%f" % (
+                iteration_fix_count+1, curren_error / self.n_have_rated, percentage))
+            # previous_error = curren_error
+
+            if (iteration_fix_count > learn_loops) and (percentage < criterion):
+                break
+            iteration_fix_count += 1
+        print("Latent Factor Model done!")
+
+
 
     def pred_one_user(self, user_id, report_run_time=False):
         start_time = time()
@@ -60,6 +66,7 @@ class MatrixFactorizationRec(object):
     def pred_all_users(self, report_run_time=False):
         start_time = time()
         out = self.user_mat * self.movie_mat
+        print(self.user_mat)
         if report_run_time:
             print("Execution time: %f seconds" % (time()-start_time))
         return out
