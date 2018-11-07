@@ -46,7 +46,7 @@ class MF_LFM(object):
             print("Learning LFM Process")
             #print("Loops | MSE  | Improved percentage")
             #print("%d\t%f\t%f" % (iteration_fix_count + 1, curren_error / self.n_have_rated, percentage))
-            # previous_error = curren_error
+            previous_error = curren_error
 
             if (iteration_fix_count > learn_loops) and (percentage < criterion):
                 break
