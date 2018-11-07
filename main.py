@@ -111,7 +111,7 @@ def output_rating_CF(prediction_mat, ofname, offset):
 
 if __name__ == "__main__":
     movie_len, movie_genre_mat, movie_genre_distribute = read_movie_genre("movies.dat")
-    user_len, rating_mat, offset = read_rating("input.csv", movie_len)
+    user_len, rating_mat, offset = read_rating("training_ratings_for_kaggle_comp.csv", movie_len)
     rate_engine = MF_LFM()
     rate_engine.learningLFM(rating_mat, 8, 2, 0.005, 0.01, 0.001)
     prediction = pred_all_user(rate_engine)

@@ -44,35 +44,11 @@ class MF_LFM(object):
                             self.movie_mat[features_index, movie_index] += delta_movie
             percentage = float(previous_error - curren_error) / previous_error
             print("Learning LFM Process")
-            print("Loops | MSE  | Improved percentage")
-            print("%d\t%f\t%f" % (
-                iteration_fix_count + 1, curren_error / self.n_have_rated, percentage))
+            #print("Loops | MSE  | Improved percentage")
+            #print("%d\t%f\t%f" % (iteration_fix_count + 1, curren_error / self.n_have_rated, percentage))
             # previous_error = curren_error
 
             if (iteration_fix_count > learn_loops) and (percentage < criterion):
                 break
             iteration_fix_count += 1
         print("Latent Factor Model done!")
-
-    def pred_one_user(self, user_id, report_run_time=False):
-        start_time = time()
-        out = self.user_mat[user_id] * self.movie_mat
-        if report_run_time:
-            print("Execution time: %f seconds" % (time() - start_time))
-        return out
-
-    def pred_all_users(self, report_run_time=False):
-        start_time = time()
-        out = self.user_mat * self.movie_mat
-        print(self.user_mat)
-        if report_run_time:
-            print("Execution time: %f seconds" % (time() - start_time))
-        return out
-
-    def top_n_recs(self, user_id, n):
-        pred_ratings = self.pred_one_user(user_id)
-        item_index_sorted_by_pred_rating = list(np.argsort(pred_ratings))
-        items_rated_by_this_user = self.ratings_mat[user_id].nonzero()[1]
-        unrated_items_by_pred_rating = [item for item in item_index_sorted_by_pred_rating
-                                        if item not in items_rated_by_this_user]
-        return unrated_items_by_pred_rating[-n:]
