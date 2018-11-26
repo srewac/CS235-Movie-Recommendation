@@ -51,4 +51,11 @@ class MF_LFM(object):
             if (iteration_fix_count > learn_loops) and (percentage < criterion):
                 break
             iteration_fix_count += 1
+
+        self.movie_mask = np.zeros((features, self.n_items), float)
+        movie_mask_file = pd.read_csv("training_ratings_for_kaggle_comp.csv")
+        # movie_mat_len = movie_mask_file.movie
+        for movie_index in movie_mask_file.movie:
+            for f_index in range(features):
+                self.movie_mask[f_index][movie_index - 1] = self.movie_mat[f_index,movie_index - 1]
         print("Latent Factor Model done!")

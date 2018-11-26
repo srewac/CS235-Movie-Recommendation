@@ -80,7 +80,7 @@ def pred_one_user(recommender, user_id, offset):
 
 
 def pred_all_user(recommender):
-    out = recommender.user_mat * recommender.movie_mat
+    out = recommender.user_mat * recommender.movie_mask
     # print("predict all user using {} complete.").format(recommender.name)
     return out
 
@@ -98,7 +98,7 @@ def plot_genre(genre):
 
 
 def output_rating_CF(prediction_mat, ofname, offset):
-    with open(ofname, 'w') as f:
+    with open(ofname, 'wb') as f:
         writer = csv.writer(f)
         writer.writerow(['user', 'movie', 'rating'])
 
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     movie_len, movie_genre_mat, movie_genre_distribute = read_movie_genre("movies.dat")
     user_len, rating_mat, offset = read_rating("training_ratings_for_kaggle_comp.csv", movie_len)
     rate_engine = MF_LFM()
-    rate_engine.learningLFM(rating_mat, 8, 2, 0.005, 0.01, 0.001)
+    rate_engine.learningLFM(rating_mat, 8, 2, 0.005, 0.02, 0.02)
     prediction = pred_all_user(rate_engine)
     output_rating_CF(prediction, "test.csv", offset)
     plot_genre(movie_genre_distribute)
