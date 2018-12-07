@@ -1,4 +1,3 @@
-
 from numpy import *
 import pandas as pd
 from texttable import Texttable
@@ -98,9 +97,12 @@ class UserBasedModel(object):
         table.set_cols_dtype(["t", "t", "t", "t"])
         table.set_cols_align(["l", "l", "l", "l"])
         rows = []
-        rows.append([u"movie ID", u"Name", u"release", u"from userID"])
-
+        rows.append([u"movie ID", u"Name", u"genre", u"from userID"])
+        nodes = []
         for item in self.recommandList:
+
+            node = []
+
             fromID = []
 
             for _,row in self.movies.iterrows():
@@ -113,12 +115,17 @@ class UserBasedModel(object):
                     fromID.append(i)
             movie.append(fromID)
             rows.append(movie)
+
+            for first, second in zip(fromID, fromID[1:]):
+                print first, second
+
         table.add_rows(rows)
-        print(table.draw())
 
 demo = UserBasedModel()
 movies = pd.read_csv("movies.csv")
 ratings = pd.read_csv("ratings.csv")
-demo.learning(ratings,movies,neighbourNumber=10,recommendationNumber=20)
+demo.learning(ratings,movies,neighbourNumber=40,recommendationNumber=20)
 demo.recommendByUser(100)
 demo.showTable()
+
+
