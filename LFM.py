@@ -58,7 +58,7 @@ class MF_LFM(object):
         # movie_mat_len = movie_mask_file.movie
         for movie_index in movie_mask_file.movie:
             for f_index in range(features):
-                self.movie_mask[f_index][movie_index - 1] = self.movie_mat[f_index,movie_index - 1]
+                self.movie_mask[f_index][movie_index - 1] = self.movie_mat[f_index, movie_index - 1]
         print("Latent Factor Model done!")
 
 
@@ -72,7 +72,7 @@ class MF_LFM(object):
 
     def pred_all_users(self, report_run_time=False):
         start_time = time()
-        out = self.user_mat * self.movie_mat
+        out = self.user_mat * self.movie_mask
         print(self.user_mat)
         if report_run_time:
             print("Execution time: %f seconds" % (time()-start_time))
