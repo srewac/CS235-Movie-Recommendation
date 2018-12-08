@@ -13,13 +13,14 @@ class MF_LFM(object):
     # lamb stands for regularition parameter
     # criterion is judge factor
 
-    def learningLFM(self, ratings_mat, features, learn_loops, alpha, lamb, criterion):
+    def learningLFM(self, ratings_mat, movie_mat, features, learn_loops, alpha, lamb, criterion):
         self.ratings_mat = ratings_mat
         self.n_users = ratings_mat.shape[0]
         self.n_items = ratings_mat.shape[1]
         self.n_have_rated = ratings_mat.nonzero()[0].size
         self.user_mat = matrix(rand(self.n_users, features))
-        self.movie_mat = matrix(rand(features, self.n_items))
+        #self.movie_mat = matrix(rand(features, self.n_items))
+        self.movie_mat = movie_mat
         iteration_fix_count = 0
         curren_error = 100
         for step in xrange(0, 5000,1):

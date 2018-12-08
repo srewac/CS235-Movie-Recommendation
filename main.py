@@ -48,27 +48,9 @@ def read_rating(fname, movie_len):
 
 
 def read_movie_genre(fname):
-    '''with open(fname, 'rb') as f:
-        movie_list = f.read().splitlines()
-        movie_len = int(movie_list[movie_list.__len__() - 1].split("::")[0])
-        movie_genre_mat = sparse.lil_matrix((movie_len, Genre.__len__()))
-        genre_distribute = [0 for i in range(18)]
-        for movie in movie_list:
-            movie_genre = movie.split("::")
-            for genre in movie_genre[2].split('|'):
-                if (genre == "Children's"):
-                    genre = "Children"
-                if (genre == "Sci-Fi"):
-                    genre = "SciFi"
-                if (genre == "Film-Noir"):
-                    genre = "FilmNoir"
-                movie_genre_mat[int(movie_genre[0]) - 1, Genre[genre].value] = 1
-                genre_distribute[Genre[genre].value] += 1
-    print("movie genre read complete")
-    return movie_len, movie_genre_mat, genre_distribute
-    '''
     movie = pd.read_csv(fname,sep='::')
-    movie_genre_mat = sparse.lil_matrix((movie.movieId.max()+1, Genre.__len__()))
+    #movie_genre_mat = sparse.lil_matrix((movie.movieId.max()+1, Genre.__len__()))
+    movie_genre_mat = np.random.rand(Genre.__len__(), movie.movieId.max()+1)
     genre_distribute = [0 for i in range(18)]
     for _, row in movie.iterrows():
         for genre in row.genres.split('|'):
@@ -78,7 +60,7 @@ def read_movie_genre(fname):
                 genre = "SciFi"
             if (genre == "Film-Noir"):
                 genre = "FilmNoir"
-            movie_genre_mat[row.movieId, Genre[genre].value] = 1
+            movie_genre_mat[Genre[genre].value, row.movieId] = 1.2
             genre_distribute[Genre[genre].value] += 1
     print("movie genre read complete")
     return movie.movieId.max()+1, movie_genre_mat, genre_distribute
@@ -95,7 +77,7 @@ def plot_genre(genre):
     plt.bar(x, height=genre)
     plt.xticks(x, genre_array())
     plt.show()
-    print(genre)
+    #print(genre)
     return
 
 def output_rating_CF(prediction_mat, ofname, offset):
@@ -115,7 +97,7 @@ if __name__ == "__main__":
     plot_genre(movie_genre_distribute)
 
     rate_engine = MF_LFM()
-    rate_engine.learningLFM(rating_mat, 8, 2, 0.005, 0.02, 0.02)
+    rate_engine.learningLFM(rating_mat,movie_genre_mat, 18, 2, 0.005, 0.02, 0.02)
     '''
     prediction = rate_engine.pred_all_user()
     output_rating_CF(prediction, "test.csv", offset)
