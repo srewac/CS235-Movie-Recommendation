@@ -13,14 +13,15 @@ class MF_LFM(object):
     # lamb stands for regularition parameter
     # criterion is judge factor
 
-    def learningLFM(self, ratings_mat, movie_mat, features, learn_loops, alpha, lamb, criterion):
+    def learningLFM(self, ratings_mat, input_movie_mat, features, learn_loops, alpha, lamb, criterion):
         self.ratings_mat = ratings_mat
         self.n_users = ratings_mat.shape[0]
         self.n_items = ratings_mat.shape[1]
         self.n_have_rated = ratings_mat.nonzero()[0].size
         self.user_mat = matrix(rand(self.n_users, features))
         #self.movie_mat = matrix(rand(features, self.n_items))
-        self.movie_mat = movie_mat
+        self.movie_mat = input_movie_mat
+        print(self.movie_mat)
         iteration_fix_count = 0
         curren_error = 100
         for step in xrange(0, 5000,1):
@@ -54,13 +55,14 @@ class MF_LFM(object):
             iteration_fix_count += 1
 
         self.movie_mask = np.zeros((features, self.n_items), float)
-        movie_mask_file = pd.read_csv("training_ratings_for_kaggle_comp.csv")
+        movie_mask_file = pd.read_csv("rating.csv")
         # movie_mat_len = movie_mask_file.movie
         for movie_index in movie_mask_file.movie:
             for f_index in range(features):
                 self.movie_mask[f_index][movie_index - 1] = self.movie_mat[f_index, movie_index - 1]
         print("Latent Factor Model done!")
-
+        print(self.movie_mat)
+        print(self.user_mat)
 
 
     def pred_one_user(self, user_id, report_run_time=False):
