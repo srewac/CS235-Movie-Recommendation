@@ -91,16 +91,19 @@ class UserBasedModel(object):
         self.recommandList.sort(reverse=True)
         self.recommandList = self.recommandList[:self.n]
 
-    def showTable(self):
+    def showTable(self,userId):
         neighbors_id = [i[1] for i in self.neighbors]
         table = Texttable()
         table.set_deco(Texttable.HEADER)
         table.set_cols_dtype(["t", "t", "t", "t"])
         table.set_cols_align(["l", "l", "l", "l"])
         rows = []
-        rows.append([u"movie ID", u"Name", u"release", u"from userID"])
-
+        rows.append([u"movie ID", u"Name", u"genre", u"from userID"])
+        nodes = []
         for item in self.recommandList:
+
+            node = []
+
             fromID = []
 
             for _,row in self.movies.iterrows():
@@ -113,8 +116,13 @@ class UserBasedModel(object):
                     fromID.append(i)
             movie.append(fromID)
             rows.append(movie)
+
+            with open('neighbour.txt','ab') as f:
+                for first in fromID:
+                    temp =str(userId)+','+str(first)+'\n'
+                    f.write(temp)
+
         table.add_rows(rows)
-        print(table.draw())
 '''
 demo = UserBasedModel()
 movies = pd.read_csv("movies.csv")
