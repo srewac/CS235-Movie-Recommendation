@@ -6,6 +6,7 @@ from enum import Enum
 from LFM import *
 import matplotlib.pyplot as plt
 from UserBasedModel import *
+import math
 
 class Genre(Enum):
     Action = 0
@@ -177,6 +178,25 @@ def output_rating_CF(prediction_mat, ofname, offset):
             print("write file {0} complete").format(ofname)
     return
 
+
+def evaluate_RMSE(prediction , rating_mat):
+    row = rating_mat.shape[0]
+    col = rating_mat.shape[1]
+    total_error = 0
+    count = 0
+    for row_index in range(row):
+        for col_index in range(col):
+            if rating_mat[row_index, col_index] != 0 and prediction[row_index, col_index] != 0:
+                error = rating_mat[row_index , col_index] - prediction[row_index, col_index]
+                total_error += pow(error, 2)
+                count += 1
+
+    RMSE = math.sqrt(total_error/count)
+    print("RMSE of LFM is")
+    print(RMSE)
+    return
+
+
 if __name__ == "__main__":
 
     movie_len, movie_genre_mat, movie_genre_distribute = read_movie_genre("movies.dat")
@@ -189,6 +209,11 @@ if __name__ == "__main__":
     rating_user_info(user_genre,user_info)
     rate_engine = MF_LFM()
     rate_engine.learningLFM(rating_mat,movie_genre_mat, 18, 2, 0.05, 0.02, 0.02)
+
+    output_prediction = rate_engine.pred_all_users()
+    evaluate_RMSE(output_prediction, rating_mat)
+
+
     print(rate_engine.top_n_recs(2789,10))
 
     '''
