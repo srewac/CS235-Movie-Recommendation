@@ -7,6 +7,7 @@ from LFM import *
 import matplotlib.pyplot as plt
 from UserBasedModel import *
 import math
+import random
 
 class Genre(Enum):
     Action = 0
@@ -47,6 +48,14 @@ def read_rating(fname, movie_len):
     print("read file {0} complete").format(fname)
     return user_mat_len, ratings_as_mat, offset
 
+def get_training_mat(rating_mat):
+    for i in range(user_len):
+        for j in range(movie_len):
+            if rating_mat[i,j]!=0:
+                keep_or_kick = random.randint(0,100)
+                if keep_or_kick>80:
+                    rating_mat[i,j]=0
+    return rating_mat
 
 def read_movie_genre(fname):
     movie = pd.read_csv(fname,sep='::')
@@ -87,7 +96,7 @@ def get_user_genre(rating_mat, movie_genre_mat, offset):
         print('\n')
     return user_genre
 
-def rating_user_info(user_genre,user_info):
+def get_user_preference(user_genre,user_info):
     occu = np.zeros((21,Genre.__len__()))
     age = np.zeros((7,Genre.__len__()))
     gender = np.zeros((2,Genre.__len__()))
@@ -122,7 +131,7 @@ def rating_user_info(user_genre,user_info):
         occu_counter[row.Occupation]+=1
         age_counter[age_idx]+=1
         gender_counter[genderidf]+=1
-    '''
+
     for i in range(Genre.__len__()):
         for j in range(21):
             occu[j,i]/=occu_counter[j]
@@ -130,7 +139,7 @@ def rating_user_info(user_genre,user_info):
             age[j,i]/=age_counter[j]
         for j in range(2):
             gender[j,i]/=age_counter[j]
-    '''
+
     with open('user_info_based.txt', 'wb') as f:
         f.write("Job\n")
         #print("Job\n")
@@ -196,6 +205,17 @@ def evaluate_RMSE(prediction , rating_mat):
     print(RMSE)
     return
 
+def get_initial_user_mat(user_info, occu):
+    user_genre_mat = np.random.rand(user_len,Genre.__len__())
+    counter=0
+    for _, row in user_info.iterrows():
+        occupation = row.Occupation
+        counter+=1
+        for i in range(Genre.__len__()):
+            user_genre_mat[counter,i]= occu[occupation,i]/5
+
+    return user_genre_mat
+
 
 if __name__ == "__main__":
 
@@ -204,11 +224,14 @@ if __name__ == "__main__":
 
     plot_genre(movie_genre_distribute)
 
-    user_genre =  get_user_genre(rating_mat,movie_genre_mat,offset)
-    user_info = pd.read_csv("users.dat",sep='::')
-    rating_user_info(user_genre,user_info)
+    user_genre = get_user_genre(rating_mat,movie_genre_mat,offset)
+    user_info = pd.read_csv("toy_user.dat",sep='::')
+    user_occu = get_user_preference(user_genre,user_info)
+    training_mat = get_training_mat(rating_mat)
+
+    user_genre_mat = get_initial_user_mat(user_info, user_occu)
     rate_engine = MF_LFM()
-    rate_engine.learningLFM(rating_mat,movie_genre_mat, 18, 2, 0.05, 0.02, 0.02)
+    rate_engine.learningLFM(training_mat,user_genre_mat,movie_genre_mat, 18, 2, 0.05, 0.02, 0.02)
 
     output_prediction = rate_engine.pred_all_users()
     evaluate_RMSE(output_prediction, rating_mat)
