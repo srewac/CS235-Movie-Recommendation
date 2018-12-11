@@ -19,7 +19,8 @@ class UserBasedModel(object):
         self.formatRate()
         self.getNearestNeighbor(userId)
         self.getRecommandList()
-
+        self.getPrecision(userId)
+    
     def formatRate(self):
         self.userDict = {}
         self.ItemUser = {}
@@ -90,6 +91,21 @@ class UserBasedModel(object):
             self.recommandList.append([recommandDict[key], key])
         self.recommandList.sort(reverse=True)
         self.recommandList = self.recommandList[:self.n]
+
+    def getPrecision(self, userId):
+        user = [i[0] for i in self.userDict[userId]]
+        recommand = [i[1] for i in self.recommandList]
+        count = 0.0
+        if(len(user) >= len(recommand)):
+            for i in recommand:
+                if(i in user):
+                    count += 1.0
+            self.cost = count / len(recommand)
+        else:
+            for i in user:
+                if(i in recommand):
+                    count += 1.0
+            self.cost = count / len(user)
 
     def showTable(self,userId):
         neighbors_id = [i[1] for i in self.neighbors]
