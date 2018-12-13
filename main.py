@@ -220,7 +220,7 @@ def get_initial_user_mat(user_info, occu):
 if __name__ == "__main__":
 
     recommend_user_id = 2789
-    enable_hybrid = True
+    enable_hybrid = False
 
     movie_len, movie_genre_mat, movie_genre_distribute = read_movie_genre("movies.dat")
     user_len, rating_mat, offset = read_rating("rating.csv", movie_len)
@@ -228,7 +228,7 @@ if __name__ == "__main__":
     #plot_genre(movie_genre_distribute)
 
     user_genre = get_user_genre(rating_mat,movie_genre_mat,offset)
-    user_info = pd.read_csv("toy_user.dat",sep='::')
+    user_info = pd.read_csv("users.dat",sep='::')
     user_occu = get_user_preference(user_genre,user_info)
     training_mat = get_training_mat(rating_mat)
 
