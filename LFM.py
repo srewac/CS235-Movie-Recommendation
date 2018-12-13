@@ -14,16 +14,19 @@ class MF_LFM(object):
     # lamb stands for regularition parameter
     # criterion is judge factor
 
-    def learningLFM(self, ratings_mat, input_user_mat, input_movie_mat, features, learn_loops, alpha, lamb, criterion):
+    def learningLFM(self, ratings_mat, input_user_mat, input_movie_mat, enable_hybrid, features, learn_loops, alpha, lamb, criterion):
         self.ratings_mat = ratings_mat
         self.n_users = ratings_mat.shape[0]
         self.n_items = ratings_mat.shape[1]
         self.n_have_rated = ratings_mat.nonzero()[0].size
-        self.user_mat = matrix(rand(self.n_users, features))
-        self.user_mat = input_user_mat
-        #self.movie_mat = matrix(rand(features, self.n_items))
-        self.movie_mat = input_movie_mat
-        print(self.movie_mat)
+
+        if enable_hybrid:
+            self.user_mat = input_user_mat
+            self.movie_mat = input_movie_mat
+        else:
+            self.user_mat = matrix(rand(self.n_users, features))
+            self.movie_mat = matrix(rand(features, self.n_items))
+
         iteration_fix_count = 0
         curren_error = 100
         for step in xrange(0, 5000,1):
@@ -69,7 +72,7 @@ class MF_LFM(object):
 
     def pred_one_user(self, user_id, report_run_time=False):
         start_time = time()
-        out = dot(self.user_mat[user_id],self.movie_mat)
+        out = dot(self.user_mat[user_id-1],self.movie_mat)
         if report_run_time:
             print("Execution time: %f seconds" % (time()-start_time))
         return out

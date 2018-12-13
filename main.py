@@ -171,7 +171,7 @@ def plot_genre(genre):
     plt.xlabel("genre")
     x = np.arange(18)
     plt.bar(x, height=genre)
-    plt.xticks(x, genre_array())
+    plt.xticks(x, genre_array(),rotation=90)
     plt.show()
     #print(genre)
     return
@@ -219,10 +219,13 @@ def get_initial_user_mat(user_info, occu):
 
 if __name__ == "__main__":
 
+    recommend_user_id = 2789
+    enable_hybrid = True
+
     movie_len, movie_genre_mat, movie_genre_distribute = read_movie_genre("movies.dat")
     user_len, rating_mat, offset = read_rating("rating.csv", movie_len)
 
-    plot_genre(movie_genre_distribute)
+    #plot_genre(movie_genre_distribute)
 
     user_genre = get_user_genre(rating_mat,movie_genre_mat,offset)
     user_info = pd.read_csv("toy_user.dat",sep='::')
@@ -231,22 +234,16 @@ if __name__ == "__main__":
 
     user_genre_mat = get_initial_user_mat(user_info, user_occu)
     rate_engine = MF_LFM()
-    rate_engine.learningLFM(training_mat,user_genre_mat,movie_genre_mat, 18, 2, 0.05, 0.02, 0.02)
+    rate_engine.learningLFM(training_mat,user_genre_mat,movie_genre_mat,enable_hybrid, 18, 2, 0.05, 0.02, 0.02)
 
     output_prediction = rate_engine.pred_all_users()
     evaluate_RMSE(output_prediction, rating_mat)
+    print(rate_engine.top_n_recs(recommend_user_id,10))
 
-
-    print(rate_engine.top_n_recs(2789,10))
-
-    '''
     rate_engine2= UserBasedModel()
     movies = pd.read_csv("movies.dat",sep='::')
     ratings = pd.read_csv("rating.csv")
-    rate_engine2.learning(ratings, movies, neighbourNumber=40, recommendationNumber=20)
-    for i in range(2790,2990):
-        rate_engine2.recommendByUser(i)
-        rate_engine2.showTable(i)
-        print(i)
-    '''
+    rate_engine2.learning(ratings, movies, neighbourNumber=10, recommendationNumber=20)
+    rate_engine2.recommendByUser(recommend_user_id)
+    rate_engine2.showTable(recommend_user_id)
 

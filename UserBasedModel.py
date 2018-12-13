@@ -129,7 +129,7 @@ class UserBasedModel(object):
 
             for i in self.ItemUser[item[1]]:
                 if i in neighbors_id:
-                    fromID.append(i)
+                    fromID.append(int(i))
             movie.append(fromID)
             rows.append(movie)
 
@@ -139,6 +139,7 @@ class UserBasedModel(object):
                     f.write(temp)
 
         table.add_rows(rows)
+        print(table.draw())
 '''
 demo = UserBasedModel()
 movies = pd.read_csv("movies.csv")
