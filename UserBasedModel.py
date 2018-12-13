@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 from numpy import *
 import pandas as pd
 from texttable import Texttable
@@ -99,8 +99,9 @@ class UserBasedModel(object):
         for i in user:
             if(i in recommand):
                 count += 1.0
+
         print("Precision： %.2f " % (count / len(recommand)))
-        print("Recall： %.2f " % (self.cost))
+        print("Recall： %.2f " % (count / len(user)))
 
     def showTable(self,userId):
         neighbors_id = [i[1] for i in self.neighbors]
@@ -135,12 +136,13 @@ class UserBasedModel(object):
 
         table.add_rows(rows)
         print(table.draw())
+
+
 '''
 demo = UserBasedModel()
 movies = pd.read_csv("movies.csv")
-ratings = pd.read_csv("ratings.csv")
+ratings = pd.read_csv("rating.csv")
 demo.learning(ratings,movies,neighbourNumber=10,recommendationNumber=20)
-demo.recommendByUser(100)
-demo.showTable()
-
+demo.recommendByUser(2793)
+demo.showTable(2793)
 '''
