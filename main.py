@@ -144,7 +144,7 @@ def get_user_preference(user_genre,user_info):
         f.write("Job\n")
         #print("Job\n")
         for j in range(21):
-            f.write('\n'+str(j))
+            f.write('\n'+str(j)+'\t')
             for i in range(Genre.__len__()):
                 occu[j, i] /= occu_counter[j]
                 f.write(str(round(occu[j,i],3))+'\t')
